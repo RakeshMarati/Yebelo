@@ -44,7 +44,7 @@ services:
     environment:
       CONFIG_FILEPATH: /tmp/config.yml
     command:
-      - --config
+      - --config.filepath
       - /tmp/config.yml
     ports:
       - "8080:8080"
