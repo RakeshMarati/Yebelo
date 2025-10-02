@@ -1,7 +1,15 @@
 [package]
-name = "trading-producer"
+name = "trading-system"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "producer"
+path = "src/main.rs"
+
+[[bin]]
+name = "consumer"
+path = "src/consumer_main.rs"
 
 [dependencies]
 tokio = { version = "1.0", features = ["full"] }
@@ -11,3 +19,5 @@ serde_json = "1.0"
 uuid = { version = "1.0", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.8"
+warp = "0.3"
+futures = "0.3"
