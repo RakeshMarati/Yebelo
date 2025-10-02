@@ -2,4 +2,4 @@ redpanda:
   brokers: ["redpanda:9092"]
   adminApi:
     enabled: true
-    brokers: ["redpanda:9644"]
+    brokers: ["redpanda:9645"]
