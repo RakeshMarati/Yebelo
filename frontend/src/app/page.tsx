@@ -27,6 +27,22 @@ export default function TradingDashboard() {
   const [isClient, setIsClient] = useState(false);
   const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
 
+  // Fallback demo data to render while API is empty/unavailable
+  const SAMPLE_PRICES: Record<string, number> = {
+    AAPL: 172.35,
+    GOOGL: 2815.42,
+    MSFT: 409.12,
+    TSLA: 194.77,
+    AMZN: 168.24,
+  };
+  const SAMPLE_RSI: Record<string, number> = {
+    AAPL: 58.2,
+    GOOGL: 64.7,
+    MSFT: 45.3,
+    TSLA: 72.9,
+    AMZN: 28.6,
+  };
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -40,27 +56,36 @@ export default function TradingDashboard() {
         ]);
         
         const pricesData = await pricesRes.json();
-        const rsiData = await rsiRes.json();
+        const rsiDataResp = await rsiRes.json();
         
-        if (Object.keys(pricesData).length > 0) {
-          setPrices(pricesData);
-          setRsiData(rsiData);
-          setIsConnected(true);
-          
-          // Add to price history for chart
-          Object.entries(pricesData).forEach(([symbol, price]) => {
-            setPriceHistory(prev => [...prev.slice(-50), {
-              symbol,
-              price: price as number,
-              timestamp: new Date().toLocaleTimeString()
-            }]);
-          });
-        } else {
-          setIsConnected(false);
-        }
+        // If API is empty, show sample data so the UI demonstrates functionality
+        const hasLive = pricesData && Object.keys(pricesData).length > 0;
+        const nextPrices = hasLive ? pricesData : SAMPLE_PRICES;
+        const nextRsi = hasLive ? rsiDataResp : SAMPLE_RSI;
+
+        setPrices(nextPrices);
+        setRsiData(nextRsi);
+        setIsConnected(hasLive);
+        
+        // Add to price history for chart (use live or sample)
+        Object.entries(nextPrices).forEach(([symbol, price]) => {
+          setPriceHistory(prev => [
+            ...prev.slice(-50),
+            { symbol, price: price as number, timestamp: new Date().toLocaleTimeString() }
+          ]);
+        });
       } catch (error) {
         console.error('Error fetching data:', error);
         setIsConnected(false);
+        // On error, populate with sample data
+        setPrices(SAMPLE_PRICES);
+        setRsiData(SAMPLE_RSI);
+        Object.entries(SAMPLE_PRICES).forEach(([symbol, price]) => {
+          setPriceHistory(prev => [
+            ...prev.slice(-50),
+            { symbol, price: price as number, timestamp: new Date().toLocaleTimeString() }
+          ]);
+        });
       }
     };
 
