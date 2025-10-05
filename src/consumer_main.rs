@@ -11,10 +11,14 @@ use api::{ApiState, create_routes};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 Starting Trading Data Consumer...");
     
-    // Configuration
-    let brokers = "localhost:19092";
+    // Configuration - Read from environment variables
+    let brokers = std::env::var("KAFKA_BROKERS")
+        .unwrap_or_else(|_| "localhost:19092".to_string());
     let group_id = "trading-consumer-group";
-    let api_port = 3001;
+    let api_port = std::env::var("PORT")
+        .unwrap_or_else(|_| "3001".to_string())
+        .parse::<u16>()
+        .unwrap_or(3001);
     
     // Initialize data processor
     let data_processor = DataProcessor::new();
@@ -30,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Start API server
     let api_routes = create_routes(api_state.clone());
     let api_server = warp::serve(api_routes)
-        .run(([127, 0, 0, 1], api_port));
+        .run(([0, 0, 0, 0], api_port));
     
     // Start consumer in background
     let consumer_task = tokio::spawn(async move {
