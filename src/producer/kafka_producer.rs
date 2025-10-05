@@ -15,6 +15,10 @@ impl TradingProducer {
     pub fn new(brokers: &str, trade_topic: &str, rsi_topic: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let producer: FutureProducer = ClientConfig::new()
             .set("bootstrap.servers", brokers)
+            .set("security.protocol", "SASL_SSL")
+            .set("sasl.mechanism", "SCRAM-SHA-256")
+            .set("sasl.username", "svc_trading_app")
+            .set("sasl.password", "QU1SIer8xzIzN9g3XADLoNFcOioNa8")
             .set("message.timeout.ms", "5000")
             .set("acks", "all")
             .set("retries", "3")

@@ -9,8 +9,8 @@ use tokio::time::sleep;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("🚀 Starting Trading Data Producer...");
     
-    // Configuration
-    let brokers = "localhost:19092";
+    // Configuration - Use Redpanda Cloud
+    let brokers = "d3hb4i514inc2e6cdmfg.any.us-east-1.mpx.prd.cloud.redpanda.com:9092";
     let trade_topic = "trade-data";
     let rsi_topic = "rsi-data";
     
