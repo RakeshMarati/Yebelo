@@ -15,7 +15,7 @@ pub struct TradingConsumer {
 impl TradingConsumer {
     pub fn new(brokers: &str, group_id: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let mut config = ClientConfig::new();
-        config = config
+        config
             .set("bootstrap.servers", brokers)
             .set("group.id", group_id)
             .set("enable.partition.eof", "false")
@@ -25,16 +25,16 @@ impl TradingConsumer {
 
         // Add SASL authentication if environment variables are set
         if let Ok(security_protocol) = std::env::var("KAFKA_SECURITY_PROTOCOL") {
-            config = config.set("security.protocol", security_protocol);
+            config.set("security.protocol", security_protocol);
         }
         if let Ok(sasl_mechanism) = std::env::var("KAFKA_SASL_MECHANISM") {
-            config = config.set("sasl.mechanism", sasl_mechanism);
+            config.set("sasl.mechanism", sasl_mechanism);
         }
         if let Ok(sasl_username) = std::env::var("KAFKA_SASL_USERNAME") {
-            config = config.set("sasl.username", sasl_username);
+            config.set("sasl.username", sasl_username);
         }
         if let Ok(sasl_password) = std::env::var("KAFKA_SASL_PASSWORD") {
-            config = config.set("sasl.password", sasl_password);
+            config.set("sasl.password", sasl_password);
         }
 
         let consumer: StreamConsumer = config.create()?;
