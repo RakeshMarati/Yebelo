@@ -13,17 +13,33 @@ pub struct TradingProducer {
 
 impl TradingProducer {
     pub fn new(brokers: &str, trade_topic: &str, rsi_topic: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let producer: FutureProducer = ClientConfig::new()
+        let mut config = ClientConfig::new();
+        config
             .set("bootstrap.servers", brokers)
-            .set("security.protocol", "SASL_SSL")
-            .set("sasl.mechanism", "SCRAM-SHA-256")
-            .set("sasl.username", "svc_trading_app")
-            .set("sasl.password", "QU1SIer8xzIzN9g3XADLoNFcOioNa8")
             .set("message.timeout.ms", "5000")
             .set("acks", "all")
             .set("retries", "3")
-            .set("retry.backoff.ms", "100")
-            .create()?;
+            .set("retry.backoff.ms", "100");
+
+        // Add SASL authentication if environment variables are set
+        // Only use SASL_SSL if all required variables are present
+        if let (Ok(security_protocol), Ok(sasl_mechanism), Ok(sasl_username), Ok(sasl_password)) = (
+            std::env::var("KAFKA_SECURITY_PROTOCOL"),
+            std::env::var("KAFKA_SASL_MECHANISM"),
+            std::env::var("KAFKA_SASL_USERNAME"),
+            std::env::var("KAFKA_SASL_PASSWORD")
+        ) {
+            println!("🔐 Using SASL authentication");
+            config.set("security.protocol", security_protocol);
+            config.set("sasl.mechanism", sasl_mechanism);
+            config.set("sasl.username", sasl_username);
+            config.set("sasl.password", sasl_password);
+        } else {
+            println!("🔓 Using PLAINTEXT connection (no SASL)");
+            config.set("security.protocol", "PLAINTEXT");
+        }
+
+        let producer: FutureProducer = config.create()?;
 
         Ok(Self {
             producer,

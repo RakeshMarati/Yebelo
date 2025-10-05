@@ -24,17 +24,21 @@ impl TradingConsumer {
             .set("auto.offset.reset", "earliest");
 
         // Add SASL authentication if environment variables are set
-        if let Ok(security_protocol) = std::env::var("KAFKA_SECURITY_PROTOCOL") {
+        // Only use SASL_SSL if all required variables are present
+        if let (Ok(security_protocol), Ok(sasl_mechanism), Ok(sasl_username), Ok(sasl_password)) = (
+            std::env::var("KAFKA_SECURITY_PROTOCOL"),
+            std::env::var("KAFKA_SASL_MECHANISM"),
+            std::env::var("KAFKA_SASL_USERNAME"),
+            std::env::var("KAFKA_SASL_PASSWORD")
+        ) {
+            println!("🔐 Using SASL authentication");
             config.set("security.protocol", security_protocol);
-        }
-        if let Ok(sasl_mechanism) = std::env::var("KAFKA_SASL_MECHANISM") {
             config.set("sasl.mechanism", sasl_mechanism);
-        }
-        if let Ok(sasl_username) = std::env::var("KAFKA_SASL_USERNAME") {
             config.set("sasl.username", sasl_username);
-        }
-        if let Ok(sasl_password) = std::env::var("KAFKA_SASL_PASSWORD") {
             config.set("sasl.password", sasl_password);
+        } else {
+            println!("🔓 Using PLAINTEXT connection (no SASL)");
+            config.set("security.protocol", "PLAINTEXT");
         }
 
         let consumer: StreamConsumer = config.create()?;
