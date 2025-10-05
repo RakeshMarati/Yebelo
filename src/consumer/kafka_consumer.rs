@@ -14,8 +14,7 @@ pub struct TradingConsumer {
 
 impl TradingConsumer {
     pub fn new(brokers: &str, group_id: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut config = ClientConfig::new();
-        config
+        let mut config = ClientConfig::new()
             .set("bootstrap.servers", brokers)
             .set("group.id", group_id)
             .set("enable.partition.eof", "false")
