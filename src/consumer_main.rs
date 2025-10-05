@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_state = Arc::new(ApiState::new(data_processor.clone()));
     
     // Initialize consumer
-    let consumer = TradingConsumer::new(brokers, group_id)?;
+    let consumer = TradingConsumer::new(&brokers, group_id)?;
     consumer.subscribe_to_trade_data().await?;
     
     println!("📡 Connected to Redpanda at {}", brokers);
