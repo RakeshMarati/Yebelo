@@ -25,6 +25,7 @@ export default function TradingDashboard() {
   const [priceHistory, setPriceHistory] = useState<Array<{symbol: string, price: number, timestamp: string}>>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
 
   useEffect(() => {
     setIsClient(true);
@@ -34,8 +35,8 @@ export default function TradingDashboard() {
     const fetchData = async () => {
       try {
         const [pricesRes, rsiRes] = await Promise.all([
-          fetch('http://localhost:3001/prices').catch(() => ({ json: () => ({}) })),
-          fetch('http://localhost:3001/rsi').catch(() => ({ json: () => ({}) }))
+          fetch(`${API_BASE}/prices`).catch(() => ({ json: () => ({}) })),
+          fetch(`${API_BASE}/rsi`).catch(() => ({ json: () => ({}) }))
         ]);
         
         const pricesData = await pricesRes.json();
